@@ -1,0 +1,64 @@
+- name: roboshop instances management
+  hosts: localhost
+  connection: local
+  vars:
+    image_id: "ami-0220d79f3f480ecf5"
+    domain: "aslearnings.online"
+    hosted_zone_id: "Z09423303UD7JE5COLBZI"
+    instances: ["mongodb", "redis", "mysql", "rabitmq", "catalogue", "cart", "user", "shipping", "payment", "dispatcher", "frontend"]
+    action: "create"
+    common_sec_group: "common"
+  tasks:
+  - name: craete ec2-instances
+    amazon.aws.ec2_instance:
+      name: "roboshop-{{item}}"
+      region: us-east-1
+      instance_type: t3.micro
+      security_groups:
+      - "{{ common_sec_group }}"
+      - "roboshop-{{ item }}"
+      image_id: "{{ image_id }}"
+    loop: "{{ instances }}"
+    register: ec2_output
+    when: action == "create"
+
+  - name: print ec2_output
+    debug:
+      msg: "{{ec2_output}}"
+
+  - name: create or update route53 records
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain }}"
+      record: "{{ item.item }}.{{ domain }}"
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].private_ip_address }}"
+      overwrite: true
+    loop: "{{ ec2_output.results }}"
+    when: action == "create"
+
+  - name: create or update route 53 records for frontend
+    amazon.aws.route53:
+      state: present
+      zone: "{{domain}}"
+      record: "{{ item.item }}.{{ domain }}"
+      type: A 
+      ttl: 1
+      value: "{{ item.instances[0].public_ip_address }}"
+      overwrite: true
+    loop: "{{ec2_output.results}}"
+    when: 
+    - action == "create"
+    - item.item == "frontend"
+
+  - name: aws-ec2 delete instances
+    amazon.aws.ec2_instance:
+      state: absent
+      name: "roboshop-{{ item }}"
+      wait: false
+      region: "us-east-1"
+    loop: "{{ instances }}"
+    when: action == "delete"
+
+
