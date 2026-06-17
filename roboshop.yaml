@@ -5,7 +5,7 @@
     image_id: "ami-0220d79f3f480ecf5"
     domain: "aslearnings.online"
     hosted_zone_id: "Z09423303UD7JE5COLBZI"
-    instances: ["mongodb", "redis", "mysql", "rabitmq", "catalogue", "cart", "user", "shipping", "payment", "dispatcher", "frontend"]
+    instances: ["mongodb", "redis", "mysql", "rabbitmq", "catalogue", "cart", "user", "shipping", "payment", "dispatcher", "frontend"]
     action: "create"
     common_sec_group: "common"
   tasks:
@@ -22,9 +22,9 @@
     register: ec2_output
     when: action == "create"
 
-  - name: print ec2_output
-    debug:
-      msg: "{{ec2_output}}"
+  # - name: print ec2_output
+  #   debug:
+  #     msg: "{{ec2_output}}"
 
   - name: create or update route53 records
     amazon.aws.route53:
@@ -42,7 +42,7 @@
     amazon.aws.route53:
       state: present
       zone: "{{domain}}"
-      record: "roboshop.{{ item.item }}.{{ domain }}"
+      record: "roboshop.{{ domain }}"
       type: A 
       ttl: 1
       value: "{{ item.instances[0].public_ip_address }}"
