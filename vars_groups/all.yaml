@@ -9,5 +9,5 @@ USER_HOST: roboshop.user.asleanings.online
 CART_HOST: roboshop.cart.asleanings.online
 SHIPPING_HOST: roboshop.shipping.asleanings.online
 PAYMENT_HOST: roboshop.payment.asleanings.online
-DISPATCH_HOST: roboshop.dispatch.asleanings.online
+DISPATCH_HOST: roboshop.dispatcher.asleanings.online
 FRONTEND_HOST: roboshop.asleanings.online
