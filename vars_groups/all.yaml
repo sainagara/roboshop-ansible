@@ -2,4 +2,12 @@ ansible_user: ec2-user
 ansible_password: DevOps321
 MONGODB_HOST: roboshop.mongodb.asleanings.online
 REDIS_HOST: roboshop.redis.asleanings.online
+MYSQL_HOST: roboshop.mysql.asleanings.online
+RABBITMQ_HOST: roboshop.rabbitmq.asleanings.online
 CATALOGUE:HOST: roboshop.catalogue.asleanings.online
+USER_HOST: roboshop.user.asleanings.online
+CART_HOST: roboshop.cart.asleanings.online
+SHIPPING_HOST: roboshop.shipping.asleanings.online
+PAYMENT_HOST: roboshop.payment.asleanings.online
+DISPATCH_HOST: roboshop.dispatch.asleanings.online
+FRONTEND_HOST: roboshop.asleanings.online

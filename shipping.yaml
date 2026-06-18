@@ -1,0 +1,95 @@
+- name: configure shipping server
+  hosts: shipping
+  become: yes
+  tasks:
+  - name: install maven and mysql package
+    package:
+      name: "{{ item }}"
+      state: present
+    loop:
+    - maven
+    - mysql
+  
+  - name: create system user
+    user:
+      name: roboshop
+      shell: /sbin/nologin
+      home: /app
+      system: true
+      comment: "roboshop system user"
+  
+  - name: remove the app directory
+    file:
+      path: /app
+      state: absent
+
+  - name: remove existing code
+    file:
+      path: /tmp/shipping.zip
+      state: absent
+  
+  - name: create app directory
+    file:
+      path: /app
+      state: directory
+  
+  - name: download the code
+    get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
+      dest: /tmp/shipping.zip
+  
+  - name: extract the zip file
+    unarchive:
+      src: /tmp/shipping.zip
+      dest: /app
+      remote_src: yes
+
+  - name: install dependencies
+    command: mvn clean package
+    args:
+      chdir: /app
+
+  -  name: mover jar to target folder
+     command: mv target/shipping-1.0.jar shipping.jar
+     args:
+      chdir: /app
+  
+  - name: copy shipping service
+    template:
+      src: shipping.service.j2
+      dest: /etc/systemd/system/shipping.service
+
+  - name: install python dependencies
+    pip:
+      name: PyMySQL
+      executable: pip3.9
+
+  - name: load data into mysql database
+    ansible.mysql.mysql_db:
+      state: import
+      name: all
+      target: "{{ item }}"
+      login_user: root
+      login_password: RoboShop@1
+      login_host: "{{ MYSQL_HOST }}"
+    loop:
+    - /app/db/schema.sql
+    - /app/db/app-user.sql 
+    - /app/db/master-data.sql
+  
+  - name: daemon reload
+    systemd_service:
+      name: shipping
+      daemon_reload: true
+  
+  - name: enable and start the service
+    service:
+      name: shipping
+      state: restarted
+      enabled: yes
+
+  
+
+      
+
+
