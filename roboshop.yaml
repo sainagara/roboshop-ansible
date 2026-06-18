@@ -17,6 +17,7 @@
       security_groups:
       - "{{ common_sec_group }}"
       - "roboshop-{{ item }}"
+      - "ansible"
       image_id: "{{ image_id }}"
     loop: "{{ instances }}"
     register: ec2_output
