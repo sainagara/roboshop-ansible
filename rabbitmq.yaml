@@ -15,7 +15,7 @@
   - name: enable and start service
     service:
       name: rabbitmq-server
-      enables: yes
+      enabled: yes
       state: started
 
   - name: create user
