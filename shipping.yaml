@@ -64,6 +64,9 @@
       name: PyMySQL
       executable: pip3.9
 
+  - name: run mysql module supporting
+    command: ansible-galaxy collection install ansible.mysql
+
   - name: load data into mysql database
     ansible.mysql.mysql_db:
       state: import
